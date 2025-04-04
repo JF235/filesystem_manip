@@ -144,13 +144,29 @@ func determineOrganizerSourceName() {
 	// log.Printf("Aviso: Não foi possível determinar o nome exato do arquivo fonte do organizador, assumindo '%s'", organizerSourceName)
 }
 
+
+func getProjectRoot() (string, error) {
+    exePath, err := os.Executable()
+    if err != nil {
+        return "", fmt.Errorf("erro ao obter caminho do executável: %w", err)
+    }
+    
+    // O diretório raiz é o diretório pai do executável
+    return filepath.Dir(filepath.Dir(exePath)), nil
+}
+
 // --- Lógica para -list (Nova) ---
 
 func runListFunctions() error {
 
-	entries, err := os.ReadDir(".")
+	rootDir, err := getProjectRoot()
 	if err != nil {
-		return fmt.Errorf("erro ao ler diretório atual: %w", err)
+		return fmt.Errorf("erro ao determinar diretório raiz: %w", err)
+	}
+
+	entries ,err := os.ReadDir(rootDir)
+	if err != nil {
+		return fmt.Errorf("erro ao ler diretório raiz: %w", err)
 	}
 
 	listErrors := false
